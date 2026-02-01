@@ -21,20 +21,24 @@ class TodoView(private val todoService: ITodoService) {
             println("x. Keluar")
 
             val input = InputUtil.input("Pilih")
+
             val stop = when (input) {
                 "1" -> {
                     addTodo()
                     false
                 }
                 "2" -> {
+                    println()
                     updateTodo()
                     false
                 }
                 "3" -> {
+                    println()
                     searchTodo()
                     false
                 }
                 "4" -> {
+                    println()
                     sortTodo()
                     false
                 }
@@ -87,22 +91,41 @@ class TodoView(private val todoService: ITodoService) {
      * Menampilkan view update todo
      */
     fun updateTodo() {
-        println("[Mengubah Todo]")
+        println("[Memperbarui Todo]")
 
-        val strIdTodo = InputUtil.input("ID Todo yang diubah (x Jika Batal)")
+        val strIdTodo = InputUtil.input("[ID Todo] yang diubah (x Jika Batal)")
 
-        if (strIdTodo != "x") {
-            val idTodo = strIdTodo.toInt()
-            val newTitle = InputUtil.input("Judul Baru")
-            val strStatus = InputUtil.input("Status (1: Selesai, 0: Belum Selesai)")
-
-            val isFinished = when (strStatus) {
-                "1" -> true
-                else -> false
-            }
-
-            todoService.updateTodo(idTodo, newTitle, isFinished)
+        if (strIdTodo == "x") {
+            println("[x] Pembaruan todo dibatalkan.")
+            return
         }
+
+        val newTitle = InputUtil.input("Judul Baru (x Jika Batal)")
+
+        if (newTitle == "x") {
+            println("[x] Pembaruan todo dibatalkan.")
+            return
+        }
+
+        val idTodo = strIdTodo.toIntOrNull()
+        if (idTodo == null) {
+            println("[!] ID tidak valid!")
+            return
+        }
+
+        // FORMAT y/n untuk status
+        val strStatus = InputUtil.input("Apakah todo sudah selesai? (y/n)")
+
+        val newStatus = when (strStatus.lowercase()) {
+            "y" -> true
+            "n" -> false
+            else -> {
+                println("[!] Status tidak valid!")
+                return
+            }
+        }
+
+        todoService.updateTodo(idTodo, newTitle, newStatus)
     }
 
     /**
@@ -111,21 +134,14 @@ class TodoView(private val todoService: ITodoService) {
     fun searchTodo() {
         println("[Mencari Todo]")
 
-        val keyword = InputUtil.input("Kata Kunci (x Jika Batal)")
+        val keyword = InputUtil.input("Kata kunci (x Jika Batal)")
 
-        if (keyword != "x") {
-            val results = todoService.searchTodo(keyword)
-
-            println("\nHasil Pencarian:")
-            if (results.isEmpty()) {
-                println("- Tidak ada todo yang ditemukan dengan kata kunci '$keyword'")
-            } else {
-                results.forEach { todo ->
-                    println(todo)
-                }
-                println("Total: ${results.size} todo ditemukan")
-            }
+        if (keyword == "x") {
+            println("[x] Pencarian todo dibatalkan.")
+            return
         }
+
+        todoService.searchTodo(keyword)
     }
 
     /**
@@ -133,15 +149,17 @@ class TodoView(private val todoService: ITodoService) {
      */
     fun sortTodo() {
         println("[Mengurutkan Todo]")
-        println("Pilih kriteria pengurutan:")
-        println("1. Berdasarkan ID")
-        println("2. Berdasarkan Judul (A-Z)")
-        println("3. Berdasarkan Status")
 
-        val criteria = InputUtil.input("Pilih (x Jika Batal)")
+        val criteria = InputUtil.input("Urutkan berdasarkan (id/title/finished) (x Jika Batal)")
 
-        if (criteria != "x") {
-            todoService.sortTodos(criteria)
+        if (criteria == "x") {
+            println("[x] Pengurutan todo dibatalkan.")
+            return
         }
+
+        val ascendingInput = InputUtil.input("Urutkan secara ascending? (y/n)")
+        val isAscending = ascendingInput.lowercase() == "y"
+
+        todoService.sortTodos(criteria, isAscending)
     }
 }

@@ -32,45 +32,36 @@ class TodoService(private val todoRepository: ITodoRepository) : ITodoService {
         }
     }
 
-    // Implementasi update todo
-    override fun updateTodo(id: Int, newTitle: String, isFinished: Boolean) {
-        val success = todoRepository.updateTodo(id, newTitle, isFinished)
+    override fun updateTodo(id: Int, title: String, isFinished: Boolean) {
+        val success = todoRepository.updateTodo(id, title, isFinished)
         if (!success) {
-            println("[!] Gagal mengupdate todo dengan ID: $id.")
-        } else {
-            println("[✓] Todo berhasil diupdate!")
+            println("[!] Gagal memperbarui todo dengan ID: $id.")
+            return
         }
     }
 
-    // Implementasi search todo
-    override fun searchTodo(keyword: String): List<Todo> {
-        val todos = todoRepository.getAllTodos()
-        return todos.filter {
-            it.title.contains(keyword, ignoreCase = true)
+    override fun searchTodo(keyword: String) {
+        val results = todoRepository.searchTodos(keyword)
+
+        var counter = 0
+        for (todo in results) {
+            counter++
+            println(todo)
+        }
+
+        if (counter <= 0) {
+            println("- Data todo tidak ditemukan!")
         }
     }
+    override fun sortTodos(by: String, isAscending: Boolean) {
+        todoRepository.sortTodos(by)
 
-    // Implementasi sort todo
-    override fun sortTodos(criteria: String) {
-        val todos = todoRepository.getAllTodos()
-
-        val sortedTodos = when (criteria) {
-            "1" -> {
-                todos.sortedBy { it.id }
-            }
-            "2" -> {
-                todos.sortedBy { it.title.lowercase() }
-            }
-            "3" -> {
-                todos.sortedBy { it.isFinished }
-            }
-            else -> {
-                println("[!] Kriteria pengurutan tidak valid.")
-                return
+        // Jika descending, reverse list setelah sort
+        if (!isAscending) {
+            val todos = todoRepository.getAllTodos()
+            if (todos is ArrayList) {
+                todos.reverse()
             }
         }
-
-        todoRepository.setAllTodos(sortedTodos)
-        println("[✓] Todo berhasil diurutkan!")
     }
 }

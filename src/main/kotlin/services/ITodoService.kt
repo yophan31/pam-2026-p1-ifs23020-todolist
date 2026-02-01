@@ -4,7 +4,7 @@ interface ITodoService {
     fun showTodos()
     fun addTodo(title: String)
     fun removeTodo(id: Int)
-    fun updateTodo(id: Int, newTitle: String, isFinished: Boolean)  // Tambahkan
-    fun searchTodo(keyword: String): List<entities.Todo>  // Tambahkan
-    fun sortTodos(criteria: String)  // Tambahkan
+    fun updateTodo(id: Int, title: String, isFinished: Boolean)
+    fun searchTodo(keyword: String)  // Ubah dari searchTodos ke searchTodo
+    fun sortTodos(by: String, isAscending: Boolean)  // Tambah parameter isAscending
 }
